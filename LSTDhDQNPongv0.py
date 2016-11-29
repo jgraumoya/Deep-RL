@@ -71,7 +71,7 @@ with tf.name_scope('inputs'):
 # Q network
 with tf.name_scope('networkQ'):
     with tf.name_scope('layer1'):
-        W1 = tf.Variable(tf.random_normal([8,8,4,32],0,0.2), name='W1')
+        W1 = tf.get_variable('W1', shape=[8,8,4,32])
         wb1 = tf.Variable(tf.random_normal([32],0,0.2), name='wb1')
         conv_layer1 = tf.nn.relu(tf.nn.conv2d(X2, W1, strides=[1, 4, 4, 1], padding='SAME') + wb1)
         max_pool1 = tf.nn.max_pool(conv_layer1, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
