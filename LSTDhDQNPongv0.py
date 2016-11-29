@@ -69,26 +69,26 @@ with tf.name_scope('inputs'):
     Z = tf.placeholder(shape=[None, num_actions], dtype=tf.float32, name='Z')
 
 # Q network
-with tf.name_scope('networkQ'):
-    with tf.name_scope('layer1'):
-        W1 = tf.get_variable('W1', shape=[8,8,4,32])
-        wb1 = tf.Variable(tf.random_normal([32],0,0.2), name='wb1')
+with tf.variable_scope('networkQ'):
+    with tf.variable_scope('layer1'):
+        W1 = tf.get_variable('W1', shape=[8,8,4,32], initializer=tf.contrib.layers.xavier_initializer())
+        wb1 = tf.get_variable('wb1', shape=[32],initializer=tf.contrib.layers.xavier_initializer())
         conv_layer1 = tf.nn.relu(tf.nn.conv2d(X2, W1, strides=[1, 4, 4, 1], padding='SAME') + wb1)
         max_pool1 = tf.nn.max_pool(conv_layer1, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
         tf.histogram_summary(W1.name, W1)
         tf.histogram_summary(wb1.name,wb1)
 
     with tf.name_scope('layer2'):
-        W2 = tf.Variable(tf.random_normal([4,4,32,64],0,0.2), name='W2')
-        wb2 = tf.Variable(tf.random_normal([64],0,0.2), name='wb2')
+        W2 = tf.get_variable('W2', shape=[4,4,32,64],initializer=tf.contrib.layers.xavier_initializer())
+        wb2 = tf.get_variable('wb2', shape=[64], initializer=tf.contrib.layers.xavier_initializer())
         conv_layer2 = tf.nn.relu(tf.nn.conv2d(max_pool1, W2, strides=[1,2,2,1], padding='SAME') + wb2)
         max_pool2 = tf.nn.max_pool(conv_layer2, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
         tf.histogram_summary(W2.name, W2)
         tf.histogram_summary(wb2.name,wb2)
 
     with tf.name_scope('layer3'):
-        W3 = tf.Variable(tf.random_normal([3,3,64,64],0,0.2), name='W3')
-        wb3 = tf.Variable(tf.random_normal([64],0,0.2), name='wb3')
+        W3 = tf.get_variable('W3', shape=[3,3,64,64], initializer=tf.contrib.layers.xavier_initializer())
+        wb3 = tf.get_variable('wb3', shape=[64], initializer=tf.contrib.layers.xavier_initializer())
         conv_layer3 = tf.nn.relu(tf.nn.conv2d(max_pool2, W3, strides=[1,1,1,1], padding='SAME') + wb3)
         max_pool3 = tf.nn.max_pool(conv_layer3, ksize=[1,2,2,1], strides=[1,2,2,1], padding='SAME')
         flat_layer3 = tf.reshape(max_pool3, [-1, 256])
@@ -96,11 +96,11 @@ with tf.name_scope('networkQ'):
         tf.histogram_summary(wb3.name,wb3)
 
     with tf.name_scope('outputlayer'):
-        W4 = tf.Variable(tf.random_normal([256, 256], 0,0.2), name='W4')
-        wb4 = tf.Variable(tf.random_normal([256],0,0.2), name='wb4')
+        W4 = tf.get_variable('W4', shape=[256,256], initializer=tf.contrib.layers.xavier_initializer())
+        wb4 = tf.get_variable('wb4', shape=[256], initializer=tf.contrib.layers.xavier_initializer())
         ff_layer4 = tf.nn.relu(tf.matmul(flat_layer3, W4) + wb4)
 
-        W5 = tf.Variable(tf.random_normal([256, num_actions], 0,0.2), name='W5')
+        W5 = tf.get_variable('W5', shape=[256,num_actions], initializer=tf.contrib.layers.xavier_initializer())
         Qout = tf.matmul(ff_layer4,W5, name='output_Qvalues')
         tf.histogram_summary(W5.name, W5)
 
